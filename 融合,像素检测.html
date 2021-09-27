@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .demo {
+            margin: 20px auto;
+            display: block;
+            border: 5px solid pink;
+            border-radius: 50px;
+        }
+    </style>
+
+</head>
+
+<body>
+    <canvas id="app" class="demo" width="600" height="600"></canvas>
+    <script>
+        var canvas = document.getElementById('app');//获取canvas
+        var ctx = canvas.getContext('2d');//获取上下文对象
+
+        fillArc(100, 100, 100, 'red');//设置红色的圆
+        //注意：默认情况下，绿色的会覆盖红色的圆
+
+        //修改覆盖关系
+        ctx.globalCompositeOperation = 'source-in';
+
+        fillArc(200, 100, 100, 'green');//绿色的圆
+
+
+        //绘制圆
+        function fillArc(x, y, r, color) {
+            ctx.beginPath();//启动路径
+            ctx.arc(x, y, r, 0, 2 * Math.PI, false);
+            ctx.closePath()//结束路径
+            ctx.fillStyle = color;//填充色
+            ctx.fill();//填充
+        }
+
+        //获取像素点
+        var result = ctx.getImageData(0, 0, 600, 600);
+        console.log(result);
+        //判断是否有一个像素点是有值的
+        for (var i = 0, len = result.data.length; i < len; i++) {
+            //如果有一个像素点有值
+            if (result.data[i]) {
+                console.log('找到了');
+                break;
+            } else (
+                console.log('没有找到')
+            )
+        }
+
+    </script>
+</body>
+
+</html>

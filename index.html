@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIRD GAME</title>
+</head>
+
+<body style="text-align: center;">
+    <!-- <div>分数：</div> -->
+    <canvas id="app"></canvas>
+    <script src="./js/Background.js"></script>
+    <script src="./js/Bird.js"></script>
+    <script src="./js/Pipe.js"></script>
+    <script src="./js/Game.js"></script>
+
+
+
+    <script>
+
+        /**
+        *游戏分析：
+        *   玩法：点击鼠标，小鸟飞起，否则自由降落
+        *   结束：当碰撞管子或地面游戏结束，每通过一个管道加 1 分，游戏结束统计分数
+        *
+        *游戏划分：
+        *   由四部分组成：
+        *       小鸟类:              小鸟的图片，初始位置
+        *       管道类：             上下管道的图片，管道速度，初始位置
+        *       背景类（地面，山脉）：背景图片，移动速度，纵坐标y
+        *       游戏类：
+        *
+        *游戏特征：
+        *   管道与地面速度一致；
+        *   远方山脉的移动速度慢于移动的地面；
+        *   小鸟的 x轴 是固定的，且只在 x轴 起飞与降落
+        *   上下管道是对齐的，之间的通道距离是一样的
+        *   小鸟翅膀看起来在动，切换显示的图片实现
+        *   所有的元素都使用图片，因此，先加载图片，再实现动画
+        *添加交互：
+        *   每隔10s切换白天黑夜；
+        *
+        *
+        **/
+        //需要加载的图片
+        var imgList = [
+            './imgs/bird0_0.png',
+            './imgs/bird0_1.png',
+            './imgs/bird0_2.png',
+            './imgs/bg_day.png',
+            './imgs/bg_night.png',
+            './imgs/pipe_down.png',
+            './imgs/pipe_up.png',
+            './imgs/land.png'
+        ]
+        //加载图片，先加载完再执行动画
+        function loadImage(arr, callback) {
+            //加载全部图片
+            let result = [];
+            //已经加载完成的数量
+            var num = 0;
+            //遍历数组
+            for (var i = 0; i < arr.length; i++) {
+                //创建图片加载器
+                var img = new Image();
+                //图片加载完成//是异步加载的，加载的顺序不确定,所以不用这个加载图片
+                img.onload = function () {
+                    // result.push(img)
+                    // //注意：使用i时，要通过闭包存储
+                    // result[i] = img;
+                    //加载完成一张，统计一张
+                    num++;
+                    //如果全部加载完成，执行回调函数
+                    if (num === arr.length) {
+                        callback(result);// 执行回调函数
+                    }
+                }
+                //加载图片
+                img.src = arr[i];
+                //存储图片
+                result.push(img);
+            }
+        }
+
+        //使用loadImage方法加载图片
+        loadImage(imgList, function (arr) {
+            // console.log(arr);
+            //获取canvas
+            var canvas = document.getElementById('app');
+            var ctx = canvas.getContext('2d');
+            //设置画布宽高(背景图片的宽高)
+            var width = arr[7].width;
+            var height = arr[3].height;
+            //地面距离空洞的高度
+            var h = 400;
+            canvas.width = width;
+            canvas.height = height;
+
+            //实例化小鸟类、管道类、背景类、传递给游戏类
+            var bird = new Bird(arr.slice(0, 3), 100, 100);//小鸟类
+            var pipe = new Pipe(arr[5], arr[6], 4, width, h);//管道类
+            //背景是两个
+            var land = new Background(arr[7], 3, h);//背景类
+            var mountain = new Background(arr[3], 2, 0);//背景类
+
+            //传递给游戏类
+            var game = new Game(ctx, bird, pipe, land, mountain);
+
+            //启动游戏
+            game.init();
+
+        })
+
+
+    </script>
+</body>
+
+</html>
